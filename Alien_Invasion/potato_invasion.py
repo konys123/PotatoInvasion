@@ -1,7 +1,6 @@
 import sys
 
 import pygame
-from pygame.examples.go_over_there import screen
 
 from Settings.settings import Settings
 from ship import Ship
@@ -9,7 +8,8 @@ from bullet import Bullet
 from potato import Potato
 from time import sleep
 from game_stats import GameStats
-
+from button import Button
+from scoreboard import Scoreboard
 
 class PotatoInvasion:
     def __init__(self):
@@ -21,8 +21,11 @@ class PotatoInvasion:
         self.settings.screen_height = self.screen.get_rect().height
         pygame.display.set_caption("Potato Invasion")
 
+        self.play_button = Button(self, "Play")
         self.stats = GameStats(self)
+        self.sb = Scoreboard(self)
         self.ship = Ship(self)
+
         self.bullets = pygame.sprite.Group()
         self.potatoes = pygame.sprite.Group()
 
@@ -32,23 +35,29 @@ class PotatoInvasion:
         """Запуск основного цикла игры"""
         while True:
             self._check_events()
-            self.ship.update()
-            self._update_bullets()
-            self._update_potato()
+
+            if self.stats.game_active:
+                self.ship.update()
+                self._update_bullets()
+                self._update_potato()
 
             self._update_screen()
 
     def _ship_hit(self):
         """Обрабатывает столкновения корабля с картошками"""
-        self.stats.ships_left -= 1
+        if self.stats.ships_left > 0:
+            self.stats.ships_left -= 1
 
-        self.potatoes.empty()
-        self.bullets.empty()
+            self.potatoes.empty()
+            self.bullets.empty()
 
-        self._create_fleet()
-        self.ship.center_ship()
+            self._create_fleet()
+            self.ship.center_ship()
 
-        sleep(1)
+            sleep(1)
+        else:
+            self.stats.game_active = False
+            pygame.mouse.set_visible(True)
 
     def _check_fleet_edges(self):
         """Меняет направление если достигнут край экрана"""
@@ -82,11 +91,7 @@ class PotatoInvasion:
         available_space_x = self.settings.screen_width - (2 * potato_width)
         number_potatoes = available_space_x // (2 * potato_width)
 
-        ship_height = self.ship.rect.height
-        available_space_y = self.settings.screen_height - (3 * potato_height) - ship_height
-        number_rows = available_space_y // (2 * potato_height)
-
-        for row_number in range(number_rows):
+        for row_number in range(self.settings.number_rows):
             for potato_number in range(number_potatoes + 1):
                 self._create_potato(potato_number, row_number)
 
@@ -116,14 +121,15 @@ class PotatoInvasion:
         collisions = pygame.sprite.groupcollide(self.bullets, self.potatoes, True, True)
 
         if not self.potatoes:
-            self._increase_difficulty()
             self.bullets.empty()
             self._create_fleet()
+            self._increase_difficulty()
 
     def _increase_difficulty(self):
         """Увеличивает сложность игры"""
-        self.settings.potato_speed_x *= 1.1
-        self.settings.potato_speed_y *= 1.1
+        self.settings.potato_speed_x *= self.settings.speedup_scale
+        self.settings.potato_speed_y *= self.settings.speedup_scale
+        self.settings.ship_speed *= self.settings.speedup_scale
 
     def _fire_bullet(self):
         """Создание нового снаряда и добавление его в группу bullets"""
@@ -140,6 +146,23 @@ class PotatoInvasion:
                 self._check_keydown_events(event)
             elif event.type == pygame.KEYUP:
                 self._check_keyup_events(event)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                self._check_play_button(mouse_pos)
+
+    def _check_play_button(self, mouse_pos):
+        """Запускает игру при нажатии кнопки play"""
+        if self.play_button.rect.collidepoint(mouse_pos) and not self.stats.game_active:
+            self.stats.reset_stats()
+            self.stats.game_active = True
+
+            self.potatoes.empty()
+            self.bullets.empty()
+
+            self._create_fleet()
+            self.ship.center_ship()
+
+            pygame.mouse.set_visible(False)
 
     def _check_keydown_events(self, event):
         """Проверяет нажатия клавиш"""
@@ -149,7 +172,7 @@ class PotatoInvasion:
             self.ship.moving_left = True
         elif event.key == pygame.K_ESCAPE:
             sys.exit()
-        elif event.key == pygame.K_SPACE:
+        elif event.key == pygame.K_SPACE and self.stats.game_active:
             self._fire_bullet()
 
     def _check_keyup_events(self, event):
@@ -163,9 +186,15 @@ class PotatoInvasion:
         """Обновляет и рисует новый экран"""
         self.screen.fill(self.settings.bg_color)
         self.ship.blitme()
+
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
+
         self.potatoes.draw(self.screen)
+        self.sb.show_score()
+
+        if not self.stats.game_active:
+            self.play_button.draw_button()
 
         pygame.display.flip()
 
