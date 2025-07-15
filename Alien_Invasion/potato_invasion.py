@@ -120,6 +120,12 @@ class PotatoInvasion:
         """Обрабатывает столкновения снарядов с картошками"""
         collisions = pygame.sprite.groupcollide(self.bullets, self.potatoes, True, True)
 
+        if collisions:
+            for potato in collisions.values():
+                self.stats.score += self.settings.potato_points * len(potato)
+            self.sb.prep_score()
+            self.sb.check_high_score()
+
         if not self.potatoes:
             self.bullets.empty()
             self._create_fleet()
@@ -130,6 +136,7 @@ class PotatoInvasion:
         self.settings.potato_speed_x *= self.settings.speedup_scale
         self.settings.potato_speed_y *= self.settings.speedup_scale
         self.settings.ship_speed *= self.settings.speedup_scale
+        self.settings.potato_points = int(self.settings.potato_points * self.settings.score_scale)
 
     def _fire_bullet(self):
         """Создание нового снаряда и добавление его в группу bullets"""
@@ -155,6 +162,7 @@ class PotatoInvasion:
         if self.play_button.rect.collidepoint(mouse_pos) and not self.stats.game_active:
             self.stats.reset_stats()
             self.stats.game_active = True
+            self.sb.prep_score()
 
             self.potatoes.empty()
             self.bullets.empty()

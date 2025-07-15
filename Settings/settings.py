@@ -15,6 +15,8 @@ class Settings:
 
         self.number_rows = 2
         self.speedup_scale = 2
+        self.score_scale = 1.5
+
         self.init_dynamic_settings()
 
     def init_dynamic_settings(self):
@@ -25,3 +27,5 @@ class Settings:
         self.ship_speed = 1
 
         self.fleet_direction = 1 # 1 - вправо, -1 - влево
+
+        self.potato_points = 50
