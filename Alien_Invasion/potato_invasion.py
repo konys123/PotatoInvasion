@@ -24,7 +24,7 @@ class PotatoInvasion:
         self.play_button = Button(self, "Play")
         self.stats = GameStats(self)
         self.sb = Scoreboard(self)
-        self.ship = Ship(self)
+        self.ship = Ship(self, (150,150))
 
         self.bullets = pygame.sprite.Group()
         self.potatoes = pygame.sprite.Group()
@@ -47,6 +47,7 @@ class PotatoInvasion:
         """Обрабатывает столкновения корабля с картошками"""
         if self.stats.ships_left > 0:
             self.stats.ships_left -= 1
+            self.sb.prep_ships()
 
             self.potatoes.empty()
             self.bullets.empty()
@@ -131,6 +132,9 @@ class PotatoInvasion:
             self._create_fleet()
             self._increase_difficulty()
 
+            self.stats.level += 1
+            self.sb.prep_level()
+
     def _increase_difficulty(self):
         """Увеличивает сложность игры"""
         self.settings.potato_speed_x *= self.settings.speedup_scale
@@ -163,6 +167,8 @@ class PotatoInvasion:
             self.stats.reset_stats()
             self.stats.game_active = True
             self.sb.prep_score()
+            self.sb.prep_level()
+            self.sb.prep_ships()
 
             self.potatoes.empty()
             self.bullets.empty()
