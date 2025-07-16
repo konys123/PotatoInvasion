@@ -2,7 +2,7 @@ import sys
 
 import pygame
 
-from Settings.settings import Settings
+from settings import Settings
 from ship import Ship
 from bullet import Bullet
 from potato import Potato

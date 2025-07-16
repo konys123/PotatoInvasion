@@ -7,7 +7,7 @@ class Potato(Sprite):
         self.screen = game.screen
         self.settings = game.settings
 
-        self.image = pygame.image.load('D:/alien_invasion/Images/potato.bmp')
+        self.image = pygame.image.load('D:/alien_invasion/Alien_Invasion/Images/potato.bmp')
         self.image = pygame.transform.smoothscale(self.image, (65, 50))
         self.rect = self.image.get_rect()
 
