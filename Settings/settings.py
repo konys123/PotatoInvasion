@@ -7,14 +7,14 @@ class Settings:
 
         self.ship_limit = 1
 
-        self.bullet_speed = 1
-        self.bullet_width = 30
+        self.bullet_speed = 1.5
+        self.bullet_width = 10
         self.bullet_height = 15
         self.bullet_color = (60, 60, 60)
         self.bullets_allowed = 5
 
         self.number_rows = 2
-        self.speedup_scale = 2
+        self.speedup_scale = 1.5
         self.score_scale = 1.5
 
         self.init_dynamic_settings()
