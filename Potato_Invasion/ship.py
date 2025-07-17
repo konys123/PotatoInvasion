@@ -1,4 +1,5 @@
 import pygame
+from utils import resource_path
 from pygame.sprite import Sprite
 
 class Ship(Sprite):
@@ -8,8 +9,8 @@ class Ship(Sprite):
         self.settings = game.settings
         self.screen_rect = game.screen.get_rect()
 
-        self.load_image = pygame.image.load('/Potato_Invasion/Images/lykashenko.bmp')
-        self.load_reverse_image = pygame.image.load('/Potato_Invasion/Images/reverse_lykashenko.bmp')
+        self.load_image = pygame.image.load(resource_path('Images/lykashenko.bmp'))
+        self.load_reverse_image = pygame.image.load(resource_path('Images/reverse_lykashenko.bmp'))
         self.image = pygame.transform.smoothscale(self.load_image,size)
         self.reverse_image = pygame.transform.smoothscale(self.load_reverse_image, size)
         self.rect = self.image.get_rect()

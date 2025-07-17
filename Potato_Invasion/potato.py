@@ -1,4 +1,5 @@
 import pygame
+from utils import resource_path
 from pygame.sprite import Sprite
 
 class Potato(Sprite):
@@ -7,7 +8,7 @@ class Potato(Sprite):
         self.screen = game.screen
         self.settings = game.settings
 
-        self.image = pygame.image.load('/Potato_Invasion/Images/potato.bmp')
+        self.image = pygame.image.load(resource_path('Images/potato.bmp'))
         self.image = pygame.transform.smoothscale(self.image, (65, 50))
         self.rect = self.image.get_rect()
 
